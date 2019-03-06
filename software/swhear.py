@@ -16,6 +16,7 @@ import time
 import numpy as np
 import threading
 import scipy.io.wavfile
+import time
 
 def FFT(data,rate):
     """given some data points and a rate, return [freq,power]"""
@@ -44,6 +45,7 @@ class Ear(object):
         self.chunksRecorded=0
         self.p=pyaudio.PyAudio() #keep this forever
         self.t=False #later will become threads
+        self.outfile = open(time.strftime("%Y%m%d-%H%M%S")+".csv","w")
 
     ### SOUND CARD TESTING
 
@@ -115,6 +117,7 @@ class Ear(object):
             while(self.t.isAlive()):
                 time.sleep(.1) #wait for all threads to close
             self.stream.stop_stream()
+            self.outfile.close()
         self.p.terminate()
 
     ### LIVE AUDIO STREAM HANDLING
@@ -123,6 +126,8 @@ class Ear(object):
         """reads some audio and re-launches itself"""
         try:
             data = np.fromstring(self.stream.read(self.chunk),dtype=np.int16)
+            for d in data:                
+                self.outfile.write("%d\n" % d)
             self.data=np.concatenate((self.data,data))
             self.chunksRecorded+=1
             self.dataFirstI=self.chunksRecorded*self.chunk-len(self.data)

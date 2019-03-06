@@ -73,7 +73,10 @@ class ExampleApp(QtGui.QMainWindow, ui_main.Ui_MainWindow):
         webbrowser.open("http://www.SWHarden.com")
 
 if __name__=="__main__":
-    app = QtGui.QApplication(sys.argv)
+    try:
+        app = QtGui.QApplication(sys.argv)        
+    except:
+        app = QtCore.QCoreApplication.instance()
     form = ExampleApp()
     form.show()
     app.exec_()
